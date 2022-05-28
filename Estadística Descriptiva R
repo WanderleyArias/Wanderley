@@ -1,0 +1,232 @@
+# CARGAR LA BASE DE DATOS
+
+attach(Data) # separa las variables de la base de datos
+
+##########################################################
+#Realizar descriptivo de las variables.
+##########################################################
+
+#Univariado descriptivo
+
+#calcular n
+length(Id)
+
+
+#############################
+#Cualitativa_Sexo
+##############################
+
+
+#Crear una tabla a partir de la variable
+tabla<-table(sexo)
+
+tabla
+
+
+#Generar tabla con frecuencia relativa
+prop.table(tabla)
+
+
+
+#Tabla con porcentaje
+prop.table(tabla)*100
+
+
+
+#Porcentaje con n decimales
+round((prop.table(tabla)*100),2)
+
+
+
+#Gráfico de barras frecuencias
+barplot(tabla, main="Distribución por sexo", xlab = "Sexo", ylab = "Frecuencia",
+        col = c("cyan", "purple"))
+
+
+
+#Gráfico de barras con porcentajes
+tabla_2 <-prop.table(tabla)*100
+
+barplot(tabla_2, main="Distribución por sexo", xlab = "Sexo", ylab = "Frecuencia",
+        col = c("cyan", "purple"))
+
+
+###################################
+#Cuantitativa_Edad
+###################################
+
+#Promedio
+Xpro<-mean(edad);Xpro
+#Desviación estándar
+sdmu<-sd(edad);sdmu
+#Varianza
+var(edad)
+#Coeficiente de variación (A mayor CV mayor dispersión - Heterogeneidad)
+CV<-(sdmu/Xpro);CV
+CV*100
+
+#Mediana
+median(edad)
+#Rango Intercuartílico
+Q3<-quantile(edad, 0.75);Q3
+Q2<-quantile(edad, 0.25);Q2
+IQR<-(Q3 - Q2); IQR
+
+#Cinco datos
+summary(edad)
+
+
+##########################################
+#ASIMETRÍA Y CURTOSIS
+###########################################
+#Medidas que nos dicen la forma de la distribución de una variable
+
+# valor númerico
+
+
+# Asimetría = Simetría con respecto a su media
+
+# Curtosis(Apuntamiento)= Mide qué tan aplanada o puntuda es la curva
+# y cómo se agrupan valores en torno a la media
+
+
+#Asimetría
+#Instalar librería "moments"
+
+install.packages("moments")
+
+library(moments)#"llamar librería"
+
+hist(edad)
+skewness(edad)#Mayor a 0, sesgado. 0= insesgado
+
+
+kurtosis(edad)
+
+#si es menor a 3 la distribución es platicúrtica.(Aplanada)
+#si es cercano a 3 la distribución es mesocúrtica.
+#si es mayor que tres la distribución es leptocúrtica.(Puntuda)
+
+#############################################################
+#BIVARIADO DESCRIPTIVO
+#############################################################
+
+Y=peso
+X=talla
+
+#Histograma por cada variable
+hist(X, col="lightblue", main="Histograma de Variable Independiente", xlab="Distribución XXXX")
+hist(Y, col="lightsalmon", main="Histograma de Variable Dependiente", xlab="Distribución XXXX")
+
+#Análisis de relación entre variables
+pairs(X~Y)
+
+#Análisis por evento
+plot(X,Y)
+plot(Y,X)
+
+lines(X, Y, type="l")
+
+stem(X)
+stem(Y)
+
+par(mfrow=c(1,1))
+
+
+#####################################################
+#Distribución normal
+#####################################################
+
+#Función para graficar distribución normal
+normal_area <- function(mean = 0, sd = 1, lb, ub, acolor = "lightgray", ...) {
+  x <- seq(mean - 3 * sd, mean + 3 * sd, length = 100) 
+  
+  if (missing(lb)) {
+    lb <- min(x)
+  }
+  if (missing(ub)) {
+    ub <- max(x)
+  }
+  
+  x2 <- seq(lb, ub, length = 100)    
+  plot(x, dnorm(x, mean, sd), type = "n", ylab = "")
+  
+  y <- dnorm(x2, mean, sd)
+  polygon(c(lb, x2, ub), c(0, y, 0), col = acolor)
+  lines(x, dnorm(x, mean, sd), type = "l", ...)
+}
+
+###############################################
+#Ejercicio
+#############################################
+#El tiempo necesario para hacer un examen final en un determinado curso de una 
+#universidad tiene una distribución normal cuya media es 80 minutos con desviación estándar 
+#de 10 minutos.
+
+#conteste las siguientes preguntas:
+
+#a.¿Cuál es la probabilidad de terminar el examen en una hora o menos?
+#b.¿Cuál es la probabilidad de que un estudiante termine el examen en más de 60 minutos
+#pero en menos de 75 minutos?
+
+
+
+#a.¿Cuál es la probabilidad de terminar el examen en una hora o menos?
+
+#Paso 1: Establecer parámetros
+
+#Promedio
+miu<-80
+sigma<-10
+
+#Paso 2: Graficar la distribución
+normal_area(mean=miu, sd=sigma)
+
+#Paso 3: calcular probabilidad de terminar en menos de una hora
+
+prob<-round(pnorm(60,mean=miu,sd=sigma),2);prob#calcular probabilidad
+
+#Paso 4: Graficar
+
+normal_area(mean = miu, sd = sigma, ub = 60, lwd = 2, acolor = "brown")
+
+# mean: media de la variable normal
+# sd: desviación típica de la variable normal
+# lb: límite inferior del área
+# ub: límite superior del área
+# acolor: color del área
+
+
+#Gráfica final
+normal_area(mean = miu, sd = sigma, ub = 60, lwd = 2, acolor = "brown")
+text(55, 0.02,prob*100)#colocar texto en la gráfica
+
+#b.¿Cuál es la probabilidad de que un estudiante termine el examen en más de 60 minutos
+#pero en menos de 75 minutos?
+
+#Paso 2: Graficar la distribución
+normal_area(mean=miu, sd=sigma)
+
+#Paso 3: calcular probabilidad de terminar en menos de una hora
+
+prob75<-pnorm(75,mean=miu,sd=sigma);prob75 #calcular probabilidad de terminar en 75
+prob60<-pnorm(60, mean=miu,sd=sigma);prob60 # Calcular probabilidad de terminar en 60
+
+#Restar
+prob60a75<-round(prob75 - prob60,4);prob60a75
+
+#Paso 4: Graficar
+
+normal_area(mean = miu, sd = sigma, ub = 60, lwd = 2, acolor = "brown")
+
+# mean: media de la variable normal
+# sd: desviación típica de la variable normal
+# lb: límite inferior del área
+# ub: límite superior del área
+# acolor: color del área
+
+
+#Gráfica final
+normal_area(mean = miu, sd = sigma, lb= 60, ub = 75, lwd = 2, acolor = "brown")
+text(55, 0.02,prob60a75*100)#colocar texto en la gráfica
+
